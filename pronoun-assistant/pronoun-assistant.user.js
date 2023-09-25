@@ -68,6 +68,11 @@ let pronounListRegex = new RegExp('\\b((' + allPronouns + ')(\\s*/\\s*(' + allPr
 let myPronounIsRegex = /(https?:\/\/)?(my\.)?pronoun\.is\/([\w/]+)/i;
 let explicitPronounsRegex = /pronouns:\s*([^.\n)\]}<]*)(\.|\n|\)|]|}|<|$)/im;
 let unlikelyCombinations = ["her/his", "her/him", "he/she"];
+let noCollapseLimit = 10
+function wrapPronouns(pronouns) {
+  var useDropdown = pronouns.length > noCollapseLimit;
+  return (useDropdown ? "<details><summary>Pronouns</summary>" : "") + pronouns + (useDropdown ? "</details>" : "");
+}
 
 // Keys:   user IDs
 // Values: either a list of DOM elements (specifically, the anchors to chat profiles)
@@ -136,9 +141,10 @@ function showPronounsForChat($element, pronouns) {
 
 function addPronounsToChatSignatures($element, pronouns) {
   // The element might contain both a tiny and a full signature
+  var useDropdown = pronouns.length > noCollapseLimit;
   $element.find("div.username").each(function (index, usernameElement) {
     usernameElement.innerHTML = '<span class="name">' + usernameElement.innerHTML + '</span><br/>'
-      + '<span class="pronouns"> ' + pronouns + '</span>';
+      + '<span class="pronouns"> ' + wrapPronouns(pronouns) +  '</span>';
   });
 }
 
@@ -178,7 +184,7 @@ function showPronouns($element, pronouns) {
     $element = $nextElement;
   } while (true);
   
-  $element.after($('<span class="pronouns"> ' + pronouns + '</span>'));
+  $element.after($('<span class="pronouns"> ' + wrapPronouns(pronouns) + '</span>'));
 }
 
 // Check text (obtained from the user's 'about me' in their chat profile or Q&A profile) for pronoun indicators
